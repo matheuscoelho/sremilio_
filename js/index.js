@@ -17,11 +17,70 @@
  * under the License.
  */
 var app = {
+
     // Application Constructor
     initialize: function() {
-        document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
+        this.bindEvents();
+    },
+    // Bind Event Listeners
+    //
+    // Bind any events that are required on startup. Common events are:
+    // 'load', 'deviceready', 'offline', and 'online'.
+    bindEvents: function() {
+        document.addEventListener('deviceready', this.onDeviceReady, false);
     },
 
+    onDeviceReady: function() {
+        app.receivedEvent('deviceready');
+        app.pluginInitialize();
+       // socket.init();
+    },
+
+
+    // Update DOM on a Received Event
+    receivedEvent: function(id) {
+
+        alert('asd');
+    },
+
+
+    // Initialize plugin
+    pluginInitialize: function() {
+        // 1) Request background execution
+        cordova.plugins.backgroundMode.enable();
+
+        // 2) Now the app runs ins background but stays awake
+        cordova.plugins.backgroundMode.on('activate', function () {
+            setInterval(function () {
+                cordova.plugins.notification.badge.increase();
+                alert('teste');
+            }, 1000);
+        });
+
+        
+        // 3) App is back to foreground
+        cordova.plugins.backgroundMode.on('deactivate', function () {
+            cordova.plugins.notification.badge.clear();
+            alert('teste2');
+        });
+    },
+
+    capturePhoto: function(){
+
+        navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+            destinationType: Camera.DestinationType.DATA_URL, saveToPhotoAlbum: true });
+        
+        function onSuccess(imageData) {
+            var image = document.getElementById('minhaImagem');
+            image.src = "data:image/jpeg;base64," + imageData;
+            image.style.display = "block";
+        }
+        
+        function onFail(message) {
+            alert('Failed because: ' + message);
+        }
+    }
+/*
     // deviceready Event Handler
     //
     // Bind any cordova events here. Common events are:
@@ -41,6 +100,7 @@ var app = {
 
         console.log('Received Event: ' + id);
     }
+*/
 };
 
 app.initialize();
